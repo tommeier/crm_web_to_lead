@@ -14,6 +14,7 @@ class AppCallback < FatFreeCRM::Callback::Base
     # <input type="hidden" name="token"         value="-- password_token here --">
 
     params = controller.params
+    params.merge!(params[:ffcrm]).delete(:ffcrm) if (controller.request.xhr? || controller.request.headers["CONTENT_TYPE"] == 'text/xml') && params[:ffcrm]
     if controller.request.post? && !params[:authorization].blank? && !params[:token].blank?
       user = User.find_by_password_hash_and_password_salt(params[:authorization], params[:token])
 

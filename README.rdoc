@@ -50,6 +50,51 @@ get logged in Rails log file.
 
 Enjoy!
 
+== Alternative Signup with XML
+
+To submit new leads via xml (useful for inline code submissions to a synced app or via AJAX).
+Default root xml element should be :"ffcrm", this is required to ensure the parameters are checked correctly.
+
+On source app :
+
+ #Required fields:
+ #access, do-not-call, first-name, last-name 
+  xml = Builder::XmlMarkup.new
+  xml.instruct!
+  xml.ffcrm do
+     xml.lead do
+       xml.access "Public" #or Private 
+       xml.address "1234 Sample Address", "nil" => "true"
+       xml.tag!("alt-email", "", "nil" => "true")
+       xml.tag!("assigned-to", "", "nil" => "true", "type"=>"integer")
+       xml.blog "", "nil" => "true"
+       xml.tag!("campaign-id", "", "nil" => "true", "type"=>"integer")
+       xml.company "", "nil" => "true"  
+       xml.tag!("do-not-call", "false", "type"=>"boolean")
+       xml.email "foo.bar@here.com", "nil" => "true" 
+       xml.tag!("first-name", "Foo")
+       xml.tag!("last-name", "Bar")
+       xml.mobile "", "nil" => "true"
+       xml.phone "", "nil" => "true"
+       xml.tag!("referred-by", "", "nil" => "true")
+       xml.source "", "nil" => "true"
+       xml.status "", "nil" => "true"
+       xml.title "", "nil" => "true"
+       xml.tag!("user-id", "", "type" => "integer", "nil" => "true") 
+       xml.tag!("uuid", "", "nil" => "true")                               
+     end
+     xml.authorization "password_hash for user in Fat Free CRM"
+     xml.token "password_salt for user in Fat Free CRM"       
+  end
+	
+	#Add to fat free CRM
+	url = URI.parse('http://localhost:3000/leads.xml')
+	request = Net::HTTP::Post.new(url.path)
+	request.content_type = 'text/xml'
+	request.body = xml.target!
+	response = Net::HTTP.start(url.host, url.port) {|http| http.request(request)} 
+	
+
 ---
 Copyright (c) 2009 by Michael Dvorkin, released under the MIT license.
 
